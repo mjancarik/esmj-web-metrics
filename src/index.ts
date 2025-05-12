@@ -51,7 +51,7 @@ let LCP: WebMetricsType;
 let FI: WebMetricsType;
 let FID: WebMetricsType;
 let INP: WebMetricsType;
-let CLS:WebMetricsType;
+let CLS: WebMetricsType;
 
 let observer: PerformanceObserver | undefined;
 let metrics: Metrics | undefined;
@@ -218,7 +218,6 @@ export function measure() {
           value: 0,
         };
       }
-
 
       observer?.observe({
         type,

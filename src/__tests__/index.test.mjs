@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { describe, it, beforeEach, afterEach } from 'node:test';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import { getMetrics, measure } from '../index.ts';
 
@@ -26,7 +26,14 @@ describe('web-metrics', () => {
 
     globalThis.PerformanceObserver = class {
       static get supportedEntryTypes() {
-        return ['paint', 'largest-contentful-paint', 'first-input', 'layout-shift', 'navigation', 'event'];
+        return [
+          'paint',
+          'largest-contentful-paint',
+          'first-input',
+          'layout-shift',
+          'navigation',
+          'event',
+        ];
       }
 
       constructor(callback) {
@@ -114,8 +121,9 @@ describe('web-metrics', () => {
 
   it('should measure performance metrics using a mocked PerformanceObserver', async (t) => {
     //t.mock.method(globalThis.navigator, 'userAgent', {
-      t.mock.getter(globalThis.navigator, 'userAgent', {
-      value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+    t.mock.getter(globalThis.navigator, 'userAgent', {
+      value:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
     });
 
     measure();
