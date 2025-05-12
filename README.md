@@ -38,7 +38,7 @@ setTimeout(() => {
 
 ### Data Structure
 
-The `getMetrics` function returns an object with the following structure:
+The `getMetrics` function returns `undefined` for unsupported environment or an object with the following structure:
 
 ```typescript
 type Metrics = {
@@ -67,7 +67,7 @@ type Metrics = {
     FI?: { value: number | undefined };
     FID?: { value: number | undefined };
     LCP?: { value: number | undefined };
-    CLS: { value: number | undefined };
+    CLS?: { value: number | undefined };
     INP?: { value: number | undefined };
   };
   device: {
