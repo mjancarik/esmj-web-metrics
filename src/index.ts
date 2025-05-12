@@ -1,0 +1,256 @@
+type UndefinedNumber = number | undefined;
+type UndefinedString = string | undefined;
+type WebMetricsType =
+  | {
+      value: UndefinedNumber;
+    }
+  | undefined;
+type Metrics = {
+  navigation: {
+    redirect: UndefinedNumber;
+    appCache: UndefinedNumber;
+    DNS: UndefinedNumber;
+    TCP: UndefinedNumber;
+    request: UndefinedNumber;
+    response: UndefinedNumber;
+    processingToDI: UndefinedNumber;
+    processingToDCL: UndefinedNumber;
+    processingDCL: UndefinedNumber;
+    processingToDC: UndefinedNumber;
+    processingL: UndefinedNumber;
+    processing: UndefinedNumber;
+    HTML: UndefinedNumber;
+    TTFB: UndefinedNumber;
+    navigation: UndefinedNumber;
+    redirectCount: UndefinedNumber;
+    transferSize: UndefinedNumber;
+    decodedBodySize: UndefinedNumber;
+    type: UndefinedString;
+    name: UndefinedString;
+  };
+  device: {
+    width: number;
+    height: number;
+    visibilityState: DocumentVisibilityState;
+    mobile: boolean;
+    userAgent: string;
+  };
+};
+
+const NAVIGATION = 'navigation';
+const PAINT = 'paint';
+const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint';
+const FIRST_INPUT = 'first-input';
+const LAYOUT_SHIFT = 'layout-shift';
+const EVENT = 'event';
+const FIRST_CONTENTFUL_PAINT = 'first-contentful-paint';
+const round = Math.round.bind(Math) as (value: number) => number;
+
+let FCP: WebMetricsType;
+let LCP: WebMetricsType;
+let FI: WebMetricsType;
+let FID: WebMetricsType;
+let INP: WebMetricsType;
+let CLS:WebMetricsType;
+
+let observer: PerformanceObserver | undefined;
+let metrics: Metrics | undefined;
+
+function diff(end, start): number | undefined {
+  const result = end - start;
+
+  return !Number.isNaN(result) && result >= 0 ? round(result) : undefined;
+}
+
+export function measure() {
+  if (
+    typeof PerformanceObserver === 'undefined' ||
+    observer ||
+    !PerformanceObserver.supportedEntryTypes.includes(LARGEST_CONTENTFUL_PAINT)
+  ) {
+    return;
+  }
+
+  try {
+    observer = new PerformanceObserver((list) => {
+      list.getEntries().forEach((entry) => {
+        const { entryType, name, startTime, duration } = entry;
+
+        if (entryType === PAINT && name === FIRST_CONTENTFUL_PAINT) {
+          FCP = {
+            value: round(startTime),
+          };
+        }
+        if (entryType === LARGEST_CONTENTFUL_PAINT) {
+          LCP = {
+            value: round(startTime),
+            // TODO other properties
+            //duration: round(duration),
+            //loadTime: round((entry as LargestContentfulPaint).loadTime),
+            //renderTime: round((entry as LargestContentfulPaint).renderTime),
+          };
+        }
+        if (entryType === FIRST_INPUT) {
+          FID = {
+            value: round(
+              (entry as PerformanceEventTiming).processingStart - startTime,
+            ),
+          };
+          FI = {
+            value: round(startTime),
+            // TODO other properties
+            //duration: round(duration),
+            // delay: round(
+            //   (entry as PerformanceEventTiming).processingStart - startTime,
+            // ),
+            // name,
+          };
+
+          if (!INP) {
+            INP = {
+              value: round(duration),
+            };
+          }
+        }
+        // @ts-ignore
+        if (entryType === LAYOUT_SHIFT && !entry.hadRecentInput) {
+          CLS = {
+            // TODO other properties
+            // @ts-ignore
+            value: CLS.value + entry.value,
+          };
+        }
+
+        if (
+          entryType === EVENT &&
+          ['pointerup', 'pointerdown', 'click', 'keydown', 'keyup'].includes(
+            name,
+          ) &&
+          //  (entry as PerformanceEventTiming).interactionId &&
+          (!INP || (INP?.value ?? 0) < duration)
+        ) {
+          INP = {
+            // TODO other properties
+            value: round(duration),
+          };
+        }
+
+        if (entryType === NAVIGATION) {
+          const {
+            name,
+            type,
+            startTime,
+            redirectEnd,
+            redirectStart,
+            redirectCount,
+            loadEventStart,
+            loadEventEnd,
+            transferSize,
+            decodedBodySize,
+            domainLookupStart,
+            domainLookupEnd,
+            fetchStart,
+            connectEnd,
+            connectStart,
+            responseStart,
+            responseEnd,
+            requestStart,
+            domInteractive,
+            domContentLoadedEventStart,
+            domContentLoadedEventEnd,
+            domComplete,
+          } = entry as PerformanceNavigationTiming;
+
+          const { innerHeight, innerWidth } = window;
+          const { userAgent } = navigator;
+
+          metrics = {
+            navigation: {
+              redirect: diff(redirectEnd, redirectStart),
+              appCache: diff(domainLookupStart, fetchStart),
+              DNS: diff(domainLookupEnd, domainLookupStart),
+              TCP: diff(connectEnd, connectStart),
+              request: diff(responseStart, requestStart),
+              response: diff(responseEnd, responseStart),
+              processingToDI: diff(domInteractive, responseEnd),
+              processingToDCL: diff(domContentLoadedEventStart, domInteractive),
+              processingDCL: diff(
+                domContentLoadedEventEnd,
+                domContentLoadedEventStart,
+              ),
+              processingToDC: diff(domComplete, domContentLoadedEventEnd),
+              processingL: diff(loadEventEnd, loadEventStart),
+              processing: diff(loadEventEnd, domInteractive),
+              HTML: diff(responseEnd, requestStart),
+              TTFB: diff(responseStart, startTime),
+              navigation: round(loadEventEnd),
+              redirectCount,
+              transferSize,
+              decodedBodySize,
+              type,
+              name,
+            },
+            device: {
+              width: innerWidth,
+              height: innerHeight,
+              visibilityState: document.visibilityState,
+              mobile:
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                  userAgent,
+                ),
+              userAgent,
+            },
+          };
+        }
+      });
+    });
+    [
+      NAVIGATION,
+      PAINT,
+      LARGEST_CONTENTFUL_PAINT,
+      LAYOUT_SHIFT,
+      EVENT,
+      FIRST_INPUT,
+    ].forEach((type) => {
+      if (type === LAYOUT_SHIFT) {
+        // @ts-ignore
+        CLS = {
+          value: 0,
+        };
+      }
+
+
+      observer?.observe({
+        type,
+        // @ts-ignore
+        durationThreshold: 32,
+        //entryTypes: [...PerformanceObserver.supportedEntryTypes],
+        buffered: true,
+      });
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export function getMetrics() {
+  if (
+    typeof window === 'undefined' ||
+    !PerformanceObserver.supportedEntryTypes.includes(LARGEST_CONTENTFUL_PAINT)
+  ) {
+    return undefined;
+  }
+
+  return {
+    ...metrics,
+    navigation: {
+      ...metrics?.navigation,
+      FCP,
+      FI,
+      FID,
+      LCP,
+      CLS,
+      INP,
+    },
+  };
+}
