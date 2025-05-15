@@ -19,6 +19,8 @@ describe('web-metrics', () => {
     globalThis.window = {
       innerHeight: 800,
       innerWidth: 1280,
+      addEventListener: () => {},
+      removeEventListener: () => {},
     };
     globalThis.document = {
       visibilityState: 'visible',

@@ -47,6 +47,10 @@ type Metrics = {
     appCache: number | undefined;
     DNS: number | undefined;
     TCP: number | undefined;
+    TLS: number | undefined;
+    QUIC: number | undefined;
+    queueing: number | undefined;
+    worker: number | undefined;
     request: number | undefined;
     response: number | undefined;
     processingToDI: number | undefined;
@@ -74,11 +78,14 @@ type Metrics = {
     width: number;
     height: number;
     visibilityState: DocumentVisibilityState;
+    bfcache: boolena;
     mobile: boolean;
     userAgent: string;
   };
 };
 ```
+
+![Performance diagram](./doc/performance-navigation-timing-timestamp-diagram.svg)
 
 ### Notes
 

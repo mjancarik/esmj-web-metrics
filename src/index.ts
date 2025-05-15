@@ -11,6 +11,10 @@ type Metrics = {
     appCache: UndefinedNumber;
     DNS: UndefinedNumber;
     TCP: UndefinedNumber;
+    TLS: UndefinedNumber;
+    QUIC: UndefinedNumber;
+    queueing: UndefinedNumber;
+    worker: UndefinedNumber;
     request: UndefinedNumber;
     response: UndefinedNumber;
     processingToDI: UndefinedNumber;
@@ -32,6 +36,7 @@ type Metrics = {
     width: number;
     height: number;
     visibilityState: DocumentVisibilityState;
+    bfcache: boolean;
     mobile: boolean;
     userAgent: string;
   };
@@ -52,6 +57,7 @@ let FI: WebMetricsType;
 let FID: WebMetricsType;
 let INP: WebMetricsType;
 let CLS: WebMetricsType;
+let bfcache = false;
 
 let observer: PerformanceObserver | undefined;
 let metrics: Metrics | undefined;
@@ -65,11 +71,20 @@ function diff(end, start): number | undefined {
 export function measure() {
   if (
     typeof PerformanceObserver === 'undefined' ||
+    typeof window === 'undefined' ||
     observer ||
     !PerformanceObserver.supportedEntryTypes.includes(LARGEST_CONTENTFUL_PAINT)
   ) {
     return;
   }
+
+  window.addEventListener(
+    'pageshow',
+    (event: PageTransitionEvent) => {
+      bfcache = event.persisted;
+    },
+    { once: true },
+  );
 
   try {
     observer = new PerformanceObserver((list) => {
@@ -142,6 +157,7 @@ export function measure() {
             startTime,
             redirectEnd,
             redirectStart,
+            workerStart,
             redirectCount,
             loadEventStart,
             loadEventEnd,
@@ -152,6 +168,7 @@ export function measure() {
             fetchStart,
             connectEnd,
             connectStart,
+            secureConnectionStart,
             responseStart,
             responseEnd,
             requestStart,
@@ -164,12 +181,18 @@ export function measure() {
           const { innerHeight, innerWidth } = window;
           const { userAgent } = navigator;
 
+          // fetchStart - startTime => waiting on main thread || worker init phase
+
           metrics = {
             navigation: {
               redirect: diff(redirectEnd, redirectStart),
               appCache: diff(domainLookupStart, fetchStart),
               DNS: diff(domainLookupEnd, domainLookupStart),
-              TCP: diff(connectEnd, connectStart),
+              TCP: diff(secureConnectionStart, connectStart),
+              TLS: diff(connectEnd, secureConnectionStart),
+              QUIC: diff(connectEnd, connectStart),
+              queueing: diff(requestStart, fetchStart),
+              worker: diff(fetchStart, workerStart),
               request: diff(responseStart, requestStart),
               response: diff(responseEnd, responseStart),
               processingToDI: diff(domInteractive, responseEnd),
@@ -180,7 +203,7 @@ export function measure() {
               ),
               processingToDC: diff(domComplete, domContentLoadedEventEnd),
               processingL: diff(loadEventEnd, loadEventStart),
-              processing: diff(loadEventEnd, domInteractive),
+              processing: diff(loadEventEnd, responseEnd),
               HTML: diff(responseEnd, requestStart),
               TTFB: diff(responseStart, startTime),
               navigation: round(loadEventEnd),
@@ -194,6 +217,7 @@ export function measure() {
               width: innerWidth,
               height: innerHeight,
               visibilityState: document.visibilityState,
+              bfcache,
               mobile:
                 /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
                   userAgent,
@@ -223,7 +247,6 @@ export function measure() {
         type,
         // @ts-ignore
         durationThreshold: 32,
-        //entryTypes: [...PerformanceObserver.supportedEntryTypes],
         buffered: true,
       });
     });
