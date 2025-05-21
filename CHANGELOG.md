@@ -1,3 +1,9 @@
+## 0.1.0 (2025-05-21)
+
+* feat: 🎸 add more metrics and connection info ([bd17b87](https://github.com/mjancarik/esmj-web-metrics/commit/bd17b87))
+
+
+
 ## <small>0.0.3 (2025-05-15)</small>
 
 * feat: 🎸 add QUIC, TLS, queueing, worker metric ([574cbc5](https://github.com/mjancarik/esmj-web-metrics/commit/574cbc5))
