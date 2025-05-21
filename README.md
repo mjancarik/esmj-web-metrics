@@ -53,7 +53,14 @@ if (typeof document !== 'undefined') {
 }
 ```
 
-### Data Structure
+### Notes
+
+- You can call `measure()` whenever you want because the package uses `PerformanceObserver` with `buffered: true`. This ensures that all relevant performance entries are captured, even if they occurred before `measure()` was called.
+- Use `getMetrics()` to retrieve the collected metrics at any point after initialization.
+- For full functionality, the browser must support the `PerformanceObserver` API.
+- The Safari browser is not supported because most metrics are unreliable.
+
+## Data Structure
 
 The `getMetrics` function returns `undefined` for unsupported environments or an object with the following structure:
 
@@ -140,13 +147,7 @@ The `metrics.navigation` object contains the following values:
 
 ![Performance diagram](./doc/performance-navigation-timing-timestamp-diagram.svg)
 
-### Notes
-
-- Use `getMetrics()` to retrieve the collected metrics at any point after initialization.
-- For full functionality, the browser must support the `PerformanceObserver` API.
-- The Safari browser is not supported because most metrics are unreliable.
-
-## Comparison with `web-vitals`
+##  Comparison with `web-vitals`
 
 The `@esmj/web-metrics` package and the `web-vitals` package both aim to provide tools for measuring web performance metrics. However, there are key differences in their features and use cases:
 
