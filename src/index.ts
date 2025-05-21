@@ -1,3 +1,14 @@
+//EXTENDING
+type NavigatorConnection = Navigator & {
+  connection?: {
+    effectiveType?: string;
+    downlink?: number;
+    rtt?: number;
+    saveData?: boolean;
+    type?: string;
+  };
+};
+
 type UndefinedNumber = number | undefined;
 type UndefinedString = string | undefined;
 type WebMetricsType =
@@ -23,8 +34,9 @@ type Metrics = {
     processingToDC: UndefinedNumber;
     processingL: UndefinedNumber;
     processing: UndefinedNumber;
-    HTML: UndefinedNumber;
     TTFB: UndefinedNumber;
+    HTML: UndefinedNumber;
+    resource: UndefinedNumber;
     navigation: UndefinedNumber;
     redirectCount: UndefinedNumber;
     transferSize: UndefinedNumber;
@@ -39,6 +51,12 @@ type Metrics = {
     bfcache: boolean;
     mobile: boolean;
     userAgent: string;
+    connection?: {
+      effectiveType: UndefinedString;
+      downlink: UndefinedNumber;
+      rtt: UndefinedNumber;
+      saveData?: boolean;
+    };
   };
 };
 
@@ -179,22 +197,25 @@ export function measure() {
           } = entry as PerformanceNavigationTiming;
 
           const { innerHeight, innerWidth } = window;
-          const { userAgent } = navigator;
+          const { userAgent, connection } = navigator as NavigatorConnection;
 
           // fetchStart - startTime => waiting on main thread || worker init phase
 
           metrics = {
             navigation: {
               redirect: diff(redirectEnd, redirectStart),
+              worker: diff(fetchStart, workerStart),
               appCache: diff(domainLookupStart, fetchStart),
               DNS: diff(domainLookupEnd, domainLookupStart),
               TCP: diff(secureConnectionStart, connectStart),
               TLS: diff(connectEnd, secureConnectionStart),
               QUIC: diff(connectEnd, connectStart),
               queueing: diff(requestStart, fetchStart),
-              worker: diff(fetchStart, workerStart),
               request: diff(responseStart, requestStart),
               response: diff(responseEnd, responseStart),
+              TTFB: diff(responseStart, startTime),
+              HTML: diff(responseEnd, requestStart),
+              resource: diff(responseEnd, startTime),
               processingToDI: diff(domInteractive, responseEnd),
               processingToDCL: diff(domContentLoadedEventStart, domInteractive),
               processingDCL: diff(
@@ -204,8 +225,6 @@ export function measure() {
               processingToDC: diff(domComplete, domContentLoadedEventEnd),
               processingL: diff(loadEventEnd, loadEventStart),
               processing: diff(loadEventEnd, responseEnd),
-              HTML: diff(responseEnd, requestStart),
-              TTFB: diff(responseStart, startTime),
               navigation: round(loadEventEnd),
               redirectCount,
               transferSize,
@@ -225,6 +244,16 @@ export function measure() {
               userAgent,
             },
           };
+
+          if (connection) {
+            const { effectiveType, downlink, rtt, saveData } = connection;
+            metrics.device.connection = {
+              effectiveType,
+              downlink,
+              rtt,
+              saveData,
+            };
+          }
         }
       });
     });
