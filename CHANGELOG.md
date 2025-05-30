@@ -1,3 +1,10 @@
+## <small>0.1.1 (2025-05-30)</small>
+
+* fix: 🐛 ignore doc folder ([1e0e778](https://github.com/mjancarik/esmj-web-metrics/commit/1e0e778))
+* docs: ✏️ add description notes to usage example ([f522d69](https://github.com/mjancarik/esmj-web-metrics/commit/f522d69))
+
+
+
 ## 0.1.0 (2025-05-21)
 
 * feat: 🎸 add more metrics and connection info ([bd17b87](https://github.com/mjancarik/esmj-web-metrics/commit/bd17b87))
