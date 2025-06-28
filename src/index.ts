@@ -35,6 +35,7 @@ type Metrics = {
     processingL: UndefinedNumber;
     processing: UndefinedNumber;
     TTFB: UndefinedNumber;
+    TTI: UndefinedNumber;
     HTML: UndefinedNumber;
     resource: UndefinedNumber;
     navigation: UndefinedNumber;
@@ -214,6 +215,7 @@ export function measure() {
               request: diff(responseStart, requestStart),
               response: diff(responseEnd, responseStart),
               TTFB: diff(responseStart, startTime),
+              TTI: diff(domInteractive, startTime),
               HTML: diff(responseEnd, requestStart),
               resource: diff(responseEnd, startTime),
               processingToDI: diff(domInteractive, responseEnd),

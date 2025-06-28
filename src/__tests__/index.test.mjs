@@ -142,6 +142,7 @@ describe('web-metrics', () => {
     assert(metrics.navigation.INP.value === 50, 'INP should be 50');
     assert(metrics.navigation.CLS.value === 1, 'CLS should be 1');
     assert(metrics.navigation.TTFB === 300, 'TTFB should be 300');
+    assert(metrics.navigation.TTI === 500, 'TTI should be 500');
     assert(
       metrics.navigation.transferSize === 12345,
       'Transfer size should be 12345',

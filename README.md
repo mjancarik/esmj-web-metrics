@@ -78,6 +78,7 @@ type Metrics = {
     request: number | undefined;
     response: number | undefined;
     TTFB: number | undefined;
+    TTI: number | undefined;
     HTML: number | undefined;
     resource: number | undefined;
     processingToDI: number | undefined;
@@ -130,6 +131,7 @@ The `metrics.navigation` object contains the following values:
 - **request**: Time spent sending the request.
 - **response**: Time spent receiving the response.
 - **TTFB**: Time to First Byte, the time from the start of the request to the first byte of the response.
+- **TTI (Time to Interactive)**: The time it takes for the page to become fully interactive. This metric measures the time from the start of navigation until the page is capable of responding reliably to user input. It is a critical indicator of perceived performance and user experience.
 - **HTML**: Time spent downloading the HTML document.
 - **resource**: Total time spent on the resource load.
 - **processingToDI**: Time from the end of the response to the DOM Interactive event.
