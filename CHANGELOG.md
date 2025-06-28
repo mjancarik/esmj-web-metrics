@@ -1,3 +1,9 @@
+## <small>0.1.2 (2025-06-28)</small>
+
+* feat: 🎸 add TTI metric ([85a5f7a](https://github.com/mjancarik/esmj-web-metrics/commit/85a5f7a))
+
+
+
 ## <small>0.1.1 (2025-05-30)</small>
 
 * fix: 🐛 ignore doc folder ([1e0e778](https://github.com/mjancarik/esmj-web-metrics/commit/1e0e778))
