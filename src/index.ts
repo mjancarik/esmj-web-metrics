@@ -289,7 +289,9 @@ export function measure() {
 export function getMetrics() {
   if (
     typeof window === 'undefined' ||
-    !PerformanceObserver?.supportedEntryTypes?.includes(LARGEST_CONTENTFUL_PAINT)
+    !PerformanceObserver?.supportedEntryTypes?.includes(
+      LARGEST_CONTENTFUL_PAINT,
+    )
   ) {
     return undefined;
   }
