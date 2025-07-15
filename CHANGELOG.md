@@ -1,3 +1,10 @@
+## <small>0.1.3 (2025-07-15)</small>
+
+* style: 💄 fixed code style ([bd689a6](https://github.com/mjancarik/esmj-web-metrics/commit/bd689a6))
+* fix: 🐛 not throwing error for old browsers ([c50af0f](https://github.com/mjancarik/esmj-web-metrics/commit/c50af0f))
+
+
+
 ## <small>0.1.2 (2025-06-28)</small>
 
 * feat: 🎸 add TTI metric ([85a5f7a](https://github.com/mjancarik/esmj-web-metrics/commit/85a5f7a))
