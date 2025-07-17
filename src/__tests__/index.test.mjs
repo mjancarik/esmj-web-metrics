@@ -27,15 +27,21 @@ describe('web-metrics', () => {
     };
 
     globalThis.PerformanceObserver = class {
+      static types = [
+        'paint',
+        'largest-contentful-paint',
+        'first-input',
+        'layout-shift',
+        'navigation',
+        'event',
+      ];
+
       static get supportedEntryTypes() {
-        return [
-          'paint',
-          'largest-contentful-paint',
-          'first-input',
-          'layout-shift',
-          'navigation',
-          'event',
-        ];
+        return PerformanceObserver.types;
+      }
+
+      static set supportedEntryTypes(value) {
+        PerformanceObserver.types = value;
       }
 
       constructor(callback) {
@@ -151,5 +157,31 @@ describe('web-metrics', () => {
       metrics.navigation.decodedBodySize === 67890,
       'Decoded body size should be 67890',
     );
+  });
+
+  it('should not throw an error when no PerformanceObserver is available', () => {
+    globalThis.PerformanceObserver = undefined;
+
+    assert.doesNotThrow(() => {
+      measure();
+      const metrics = getMetrics();
+      assert(metrics === undefined, 'Metrics should be undefined');
+    });
+  });
+
+  it('should not throw an error when no PerformanceObserver.supportedEntryTypes is available', () => {
+    const originalSupportedEntryTypes =
+      globalThis.PerformanceObserver.supportedEntryTypes;
+    globalThis.PerformanceObserver.supportedEntryTypes = undefined;
+
+    assert.doesNotThrow(() => {
+      measure();
+      const metrics = getMetrics();
+      assert(metrics === undefined, 'Metrics should be undefined');
+    });
+
+    // Restore the original supportedEntryTypes
+    globalThis.PerformanceObserver.supportedEntryTypes =
+      originalSupportedEntryTypes;
   });
 });

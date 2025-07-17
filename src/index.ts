@@ -92,7 +92,9 @@ export function measure() {
     typeof PerformanceObserver === 'undefined' ||
     typeof window === 'undefined' ||
     observer ||
-    !PerformanceObserver.supportedEntryTypes.includes(LARGEST_CONTENTFUL_PAINT)
+    !PerformanceObserver?.supportedEntryTypes?.includes(
+      LARGEST_CONTENTFUL_PAINT,
+    )
   ) {
     return;
   }
