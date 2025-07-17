@@ -1,3 +1,9 @@
+## <small>0.1.4 (2025-07-17)</small>
+
+* fix: 🐛 browser which not support supportedEntryTypes property ([2131328](https://github.com/mjancarik/esmj-web-metrics/commit/2131328))
+
+
+
 ## <small>0.1.3 (2025-07-15)</small>
 
 * style: 💄 fixed code style ([bd689a6](https://github.com/mjancarik/esmj-web-metrics/commit/bd689a6))
