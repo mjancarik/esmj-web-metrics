@@ -288,7 +288,18 @@ export function measure() {
   }
 }
 
-export function getMetrics() {
+export function getMetrics():
+  | (Metrics & {
+      navigation: Metrics['navigation'] & {
+        FCP: WebMetricsType;
+        FI: WebMetricsType;
+        FID: WebMetricsType;
+        LCP: WebMetricsType;
+        CLS: WebMetricsType;
+        INP: WebMetricsType;
+      };
+    })
+  | undefined {
   if (
     typeof window === 'undefined' ||
     !PerformanceObserver?.supportedEntryTypes?.includes(
@@ -298,16 +309,18 @@ export function getMetrics() {
     return undefined;
   }
 
-  return {
-    ...metrics,
-    navigation: {
-      ...metrics?.navigation,
-      FCP,
-      FI,
-      FID,
-      LCP,
-      CLS,
-      INP,
-    },
-  };
+  return (
+    metrics ? {
+      ...metrics,
+      navigation: {
+        ...metrics?.navigation,
+        FCP,
+        FI,
+        FID,
+        LCP,
+        CLS,
+        INP,
+      },
+    } : undefined
+  );
 }
