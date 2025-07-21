@@ -309,18 +309,18 @@ export function getMetrics():
     return undefined;
   }
 
-  return (
-    metrics ? {
-      ...metrics,
-      navigation: {
-        ...metrics?.navigation,
-        FCP,
-        FI,
-        FID,
-        LCP,
-        CLS,
-        INP,
-      },
-    } : undefined
-  );
+  return metrics
+    ? {
+        ...metrics,
+        navigation: {
+          ...metrics?.navigation,
+          FCP,
+          FI,
+          FID,
+          LCP,
+          CLS,
+          INP,
+        },
+      }
+    : undefined;
 }
