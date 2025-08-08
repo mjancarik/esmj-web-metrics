@@ -1,3 +1,9 @@
+## <small>0.1.6 (2025-08-08)</small>
+
+* refactor: 💡 remove duplicity ([88515ae](https://github.com/mjancarik/esmj-web-metrics/commit/88515ae))
+
+
+
 ## <small>0.1.5 (2025-07-21)</small>
 
 * style: 💄 fix code style ([a0b6c5c](https://github.com/mjancarik/esmj-web-metrics/commit/a0b6c5c))
