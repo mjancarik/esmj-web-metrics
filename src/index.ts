@@ -87,15 +87,16 @@ function diff(end, start): number | undefined {
   return !Number.isNaN(result) && result >= 0 ? round(result) : undefined;
 }
 
+function isSupported(): boolean {
+  return (
+    typeof PerformanceObserver !== 'undefined' &&
+    typeof window !== 'undefined' &&
+    PerformanceObserver?.supportedEntryTypes?.includes(LARGEST_CONTENTFUL_PAINT)
+  );
+}
+
 export function measure() {
-  if (
-    typeof PerformanceObserver === 'undefined' ||
-    typeof window === 'undefined' ||
-    observer ||
-    !PerformanceObserver?.supportedEntryTypes?.includes(
-      LARGEST_CONTENTFUL_PAINT,
-    )
-  ) {
+  if (!isSupported() || observer) {
     return;
   }
 
@@ -300,27 +301,20 @@ export function getMetrics():
       };
     })
   | undefined {
-  if (
-    typeof window === 'undefined' ||
-    !PerformanceObserver?.supportedEntryTypes?.includes(
-      LARGEST_CONTENTFUL_PAINT,
-    )
-  ) {
+  if (!isSupported() || !metrics) {
     return undefined;
   }
 
-  return metrics
-    ? {
-        ...metrics,
-        navigation: {
-          ...metrics?.navigation,
-          FCP,
-          FI,
-          FID,
-          LCP,
-          CLS,
-          INP,
-        },
-      }
-    : undefined;
+  return {
+    ...metrics,
+    navigation: {
+      ...metrics?.navigation,
+      FCP,
+      FI,
+      FID,
+      LCP,
+      CLS,
+      INP,
+    },
+  };
 }
